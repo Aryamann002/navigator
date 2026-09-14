@@ -18,7 +18,7 @@ The built-in sample contract demonstrates the entire workflow without pretending
 
 | Service | Use in the application |
 | --- | --- |
-| Groq (`openai/gpt-oss-20b` by default) | Classifies user questions before retrieval. It also provides analysis, grounded Q&A, and prep generation in local or browser-session demo mode. |
+| Groq (`openai/gpt-oss-20b` by default) | Provides document analysis, plain-English clauses, grounded Q&A, answer-boundary classification, and prep generation in local or browser-session mode. |
 | Vertex AI Gemini (`gemini-2.5-pro` by default) | Produces complete clause translations, document summaries, source-linked findings, grounded answers, and lawyer-preparation content in the production architecture. |
 | Vertex AI embeddings (`gemini-embedding-001`) | Embeds encrypted document chunks and questions in the private Cloud Run RAG service for semantic retrieval. |
 
@@ -51,7 +51,7 @@ The application reports missing connections and returns an honest 503 response w
 | Component | Implementation |
 | --- | --- |
 | Frontend and delivery | Next.js App Router on Vercel. Document APIs use the Node.js runtime and send private, non-cacheable responses. |
-| Question routing | Groq classifies questions as summaries, clause questions, obligations, dates, legal-advice requests, or unrelated requests. |
+| Grounded Q&A | One structured model call classifies the answer boundary and answers from source clauses selected by retrieval, avoiding a redundant classifier request. |
 | Document reasoning | Vertex AI Gemini performs complete plain-English translation, source-linked extraction, Q&A, and lawyer-brief synthesis. |
 | Sessions and RAG | Signed HttpOnly cookie, private Cloud Run service, Firestore, Vertex embeddings, AES-256-GCM encryption, per-session authorization, and authenticated service calls. |
 | Lawyer preparation | Server-side PDF generation with source excerpts, reviewed findings, conversation concerns, professional questions, embedded fonts, and a legal-information disclaimer on every page. |
@@ -59,7 +59,7 @@ The application reports missing connections and returns an honest 503 response w
 ```mermaid
 flowchart LR
   Browser --> Next[Next.js on Vercel]
-  Next --> Groq[Groq question routing]
+  Next --> Groq[Groq analysis and grounded Q&A]
   Next --> Gemini[Vertex AI document reasoning]
   Next -->|IAM and private session| Run[Cloud Run RAG]
   Run --> Embeddings[Vertex AI embeddings]
@@ -86,5 +86,7 @@ npm run build
 ```
 
 With the local server running, `npm run test:ui` verifies the complete sample workflow on desktop and mobile, including source navigation, grounded Q&A, reviewed findings, PDF download, upload boundaries, keyboard focus, dialog focus restoration, and automated WCAG 2.0–2.2 A/AA checks with axe-core.
+
+The GitHub Actions workflow runs installation, type checking, linting, both backend suites, a production build, and the browser suite for every pull request and push to `main`.
 
 Live Groq, Vertex AI, Firestore, Cloud Run IAM, and retention checks require configured project credentials and a deployed service.

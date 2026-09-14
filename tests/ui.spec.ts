@@ -128,6 +128,8 @@ test("hosted browser-session mode analyzes and answers from an uploaded document
     buffer: Buffer.from("The client must pay INR 10,000 within 15 days after receiving an invoice. Either party may terminate with 30 days written notice."),
   });
   await expect(page.locator("dialog")).not.toBeVisible({ timeout: 240_000 });
+  await expect(page.getByRole("heading", { level: 1 })).not.toHaveText("payment-terms.");
+  await expect(page.locator('[id^="clause-local-"]')).toHaveCount(0);
   await page.getByRole("button", { name: "Ask your document", exact: true }).first().click();
   await page.getByLabel("Ask about your document", { exact: true }).fill("When must the client pay?");
   await page.getByRole("button", { name: "Send question", exact: true }).click();

@@ -5,6 +5,12 @@ export default defineConfig({
   testMatch: "ui.spec.ts",
   fullyParallel: false,
   timeout: 90_000,
+  webServer: process.env.TEST_BASE_URL ? undefined : {
+    command: "npm run dev",
+    url: "http://127.0.0.1:3000",
+    reuseExistingServer: true,
+    timeout: 120_000,
+  },
   use: { baseURL: process.env.TEST_BASE_URL || "http://localhost:3000", channel: "chrome", headless: true },
   projects: [
     { name: "desktop", use: { viewport: { width: 1440, height: 1000 } } },
