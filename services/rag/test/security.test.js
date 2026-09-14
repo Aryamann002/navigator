@@ -105,6 +105,7 @@ test("HTTP storage isolates sessions, reuses embeddings, preserves history, expi
   assert.equal((await call(other, "DELETE")).status, 204);
   assert.equal((await call(owner, "GET")).status, 200);
   const retrieval = await (await call(owner, "POST", { query: "Payment?" }, "/retrieve")).json();
+  assert.equal("document" in retrieval, false);
   assert.equal(retrieval.passages[0].text, document.text);
   assert.equal(retrieval.passages[0].score, 1);
   const updated = { ...document, messages: [{ role: "user", content: "Payment?" }] };

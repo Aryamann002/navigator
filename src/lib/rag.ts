@@ -55,7 +55,7 @@ async function request<T>(session: string, id: string, method: string, body?: un
       const document = documents.get(id); if (!document) throw Object.assign(new Error("Document not found or session expired."), { status: 404 });
       const query = String((body as { query?: string }).query || "").toLowerCase();
       const passages = document.analysis.clauses.map(clause => ({ id: clause.id, text: clause.original, score: query.split(/\s+/).filter(word => word.length > 2 && clause.original.toLowerCase().includes(word)).length })).sort((a,b) => b.score-a.score).slice(0, 8);
-      return { document, passages } as T;
+      return { passages } as T;
     }
     if (method === "DELETE") { documents.delete(id); return undefined as T; }
   }
@@ -93,7 +93,7 @@ export async function getDocument<T = LegalDocument>(session: string, id: string
   return request(session, id, "GET");
 }
 
-export async function retrieveDocument<T = LegalDocument>(session: string, id: string, query: string): Promise<{ document: T; passages: { id: string; text: string; score: number }[] }> {
+export async function retrieveDocument(session: string, id: string, query: string): Promise<{ passages: { id: string; text: string; score: number }[] }> {
   return request(session, id, "POST", { query }, "/retrieve");
 }
 

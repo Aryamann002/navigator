@@ -83,7 +83,7 @@ export function createHandler({ db, key, embed }) {
           const data = unseal(chunk.data().encrypted, key, chunk.ref.path);
           return { id: data.id, text: data.text, score: cosine(queryVector, data.vector) };
         }).sort((left, right) => right.score - left.score).slice(0, 8);
-        response.end(JSON.stringify({ document: stored.document, passages }));
+        response.end(JSON.stringify({ passages }));
       } else if (request.method === "DELETE" && !match[2]) {
         const chunks = await ref.collection("legalChunks").limit(MAX_CHUNKS).get();
         const batch = db.batch();

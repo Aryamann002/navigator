@@ -1,6 +1,45 @@
 import { test, expect } from "@playwright/test";
+import axeCore from "axe-core";
 import { PDFParse } from "pdf-parse";
 import { readFile } from "node:fs/promises";
+
+async function expectNoAccessibilityViolations(page: import("@playwright/test").Page) {
+  await page.addScriptTag({ content: axeCore.source });
+  const violations = await page.evaluate(async () => {
+    const axe = (window as unknown as { axe: typeof axeCore }).axe;
+    const results = await axe.run(document, {
+      runOnly: { type: "tag", values: ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"] },
+    });
+    return results.violations.map(({ id, impact, nodes }) => ({ id, impact, targets: nodes.map((node) => node.target) }));
+  });
+  expect(violations).toEqual([]);
+}
+
+test("all primary views meet automated WCAG A and AA checks", async ({ page }) => {
+  const response = await page.goto("/");
+  expect(response?.headers()["content-security-policy"]).toContain("frame-ancestors 'self'");
+  expect(response?.headers()["permissions-policy"]).toContain("camera=()");
+  expect(response?.headers()["x-frame-options"]).toBe("SAMEORIGIN");
+  await page.keyboard.press("Tab");
+  await expect(page.getByRole("link", { name: "Skip to main content" })).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(page.locator("#main-content")).toBeFocused();
+  await expectNoAccessibilityViolations(page);
+
+  for (const name of ["Plain English", "Ask your document", "Lawyer prep"]) {
+    await page.getByRole("button", { name, exact: true }).first().click();
+    await expectNoAccessibilityViolations(page);
+  }
+
+  await page.getByRole("button", { name: "Your workspace", exact: true }).click();
+  await expectNoAccessibilityViolations(page);
+  const upload = page.getByRole("button", { name: "Upload document", exact: true });
+  await upload.click();
+  await expect(page.getByRole("button", { name: "Close dialog" })).toBeFocused();
+  await expectNoAccessibilityViolations(page);
+  await page.keyboard.press("Escape");
+  await expect(upload).toBeFocused();
+});
 
 test("document review, grounded sample Q&A, PDF, and upload boundaries", async ({ page }, testInfo) => {
   const errors: string[] = [];
@@ -14,6 +53,10 @@ test("document review, grounded sample Q&A, PDF, and upload boundaries", async (
   await expect(image).toBeVisible();
   await expect.poll(() => image.evaluate(node => (node as HTMLImageElement).naturalWidth)).toBeGreaterThan(0);
   await image.evaluate(node => (node as HTMLImageElement).decode());
+  await page.getByRole("button", { name: "Open original sample document" }).click();
+  await expect(page.getByTitle("Original sample services agreement PDF")).toBeVisible();
+  await expect.poll(() => page.frames().some(frame => frame.url().includes("sample-contract.pdf"))).toBe(true);
+  await page.getByRole("button", { name: "Close dialog" }).click();
   await page.screenshot({ path: `artifacts/${testInfo.project.name}-overview.png`, fullPage: true });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   expect(await page.locator(".new-document").evaluate(node => getComputedStyle(node).borderRadius)).toBe("9999px");
@@ -23,6 +66,7 @@ test("document review, grounded sample Q&A, PDF, and upload boundaries", async (
   await page.getByRole("checkbox", { name: "Mark Your liability has no limit as reviewed" }).check();
   await expect(page.getByRole("checkbox", { name: "Mark Your liability has no limit as reviewed" })).toBeChecked();
   await page.locator(".finding-row").first().getByRole("button", { name: "Clause 5", exact: true }).click();
+  await expect(page.locator("#clause-5")).toBeFocused();
   await expect(page.locator("#clause-5")).toContainText("not be subject to any financial cap");
   await expect(page.locator("#clause-5 .translated-clause")).toContainText("no financial limit");
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);

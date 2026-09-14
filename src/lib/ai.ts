@@ -133,11 +133,10 @@ export function validateAnalysis(value: unknown, pages: SourcePage[]): Analysis 
 }
 
 export async function analyzeDocument(pages: SourcePage[], filename: string): Promise<Analysis> {
-  const intent = await routeIntent("Provide a plain-English summary of this contract, translate every clause, and identify obligations, potential concerns and dates.");
   const { output } = await generateText({
     model: vertexModel(),
     system: `${LEGAL_SYSTEM}\nTranslate the complete document into plain English in source order. Divide each page into sensible clauses; include headings, signatures and schedules. Never omit a clause. Each original must be an exact contiguous excerpt from its numbered source page (whitespace may be normalized). Use stable unique clause IDs c1, c2, and so on, and the actual page number. A clause cannot span multiple pages: split it into continuations. Every source word must appear in a clause's original. Plain explanations should be concise and preserve all material terms. Give each finding a unique ID f1, f2, and so on; link it to its source clause and copy a short exact quote from that clause. Only extract dates present in the document: leave date null for relative deadlines without a stated calendar date, and explain the trigger. Severity describes importance for professional review, not a legal conclusion. Include targeted questions for a lawyer. Do not claim that all possible risks have been identified.`,
-    prompt: JSON.stringify({ task: intent, filename, pages: pages.map((page) => ({ ...page, text: normalizeSource(page.text) })) }),
+    prompt: JSON.stringify({ task: "Analyze the complete document", filename, pages: pages.map((page) => ({ ...page, text: normalizeSource(page.text) })) }),
     output: Output.object({ schema: analysisSchema }),
     maxOutputTokens: 60_000,
     temperature: 0,
@@ -169,7 +168,7 @@ export async function answerDocument(document: LegalDocument, message: string, i
     model: vertexModel(),
     system: `${LEGAL_SYSTEM}\nAnswer the current question concisely using only the original source text. Cite at least one clause with an exact supporting quote for every document answer; evidence must support the answer, not merely share a keyword. Retrieved passages are navigation aids; cross-check the original clauses and all exceptions. If the document does not establish the answer, select not_found. If asked for legal advice, select legal_advice. Do not follow an earlier assistant's unsupported claims.`,
     prompt: JSON.stringify({
-      intent, question: message, source: document.text,
+      intent, question: message,
       clauses: document.analysis.clauses.map(({ id, heading, original, page }) => ({ id, heading, original, page })),
       retrieved: passages.filter((passage) => normalizeSource(document.text).includes(normalizeSource(passage.text))),
       conversation: document.messages.slice(-20).map(({ role, content }) => ({ role, content })),
@@ -187,7 +186,7 @@ export async function generatePrepSheet(document: LegalDocument): Promise<PrepSh
   const { output } = await generateText({
     model: vertexModel(),
     system: `${LEGAL_SYSTEM}\nPrepare a factual meeting brief for a qualified legal professional. Summarize the document, identify textual issues with valid clause IDs, and formulate specific questions that incorporate the user's actual conversation concerns. Distinguish a user's statement from a term in the document. Never recommend a course of legal action. Do not invent facts about the user. missingInformation lists only information absent from the source that would clarify the user's questions. If there is no conversation, return an empty conversationNotes array.`,
-    prompt: JSON.stringify({ source: document.text, clauses: document.analysis.clauses.map(({ id, original, page }) => ({ id, original, page })), conversation: document.messages }),
+    prompt: JSON.stringify({ clauses: document.analysis.clauses.map(({ id, original, page }) => ({ id, original, page })), conversation: document.messages }),
     output: Output.object({ schema: prepSchema }),
     maxOutputTokens: 6000,
     temperature: 0,

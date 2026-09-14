@@ -23,7 +23,7 @@ export async function POST(request: Request) {
     if (intent === "legal_advice" || intent === "out_of_scope") {
       answer = validateAnswer({ kind: intent, content: "Boundary response", evidence: [] }, document);
     } else {
-      const { passages } = await retrieveDocument<LegalDocument>(session, reference.id, message);
+      const { passages } = await retrieveDocument(session, reference.id, message);
       answer = await answerDocument(document, message, intent, passages);
     }
     await putDocument(session, { ...document, messages: [...document.messages, { role: "user", content: message }, { role: "assistant", ...answer }] });

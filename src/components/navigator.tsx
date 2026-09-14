@@ -166,10 +166,11 @@ export default function Navigator() {
     setTab("plain");
     setView("review");
     setTimeout(
-      () =>
-        window.document
-          .getElementById(`clause-${id}`)
-          ?.scrollIntoView({ behavior: "smooth", block: "center" }),
+      () => {
+        const clause = window.document.getElementById(`clause-${id}`);
+        clause?.focus({ preventScroll: true });
+        clause?.scrollIntoView({ behavior: "smooth", block: "center" });
+      },
       100,
     );
   }
@@ -384,6 +385,7 @@ export default function Navigator() {
 
   return (
     <div className="app-shell">
+      <a className="skip-link" href="#main-content">Skip to main content</a>
       <aside className={`sidebar ${mobileOpen ? "sidebar-open" : ""}`}>
         <Link className="brand" href="/" aria-label="Navigator home">
           <span className="brand-symbol">
@@ -405,6 +407,7 @@ export default function Navigator() {
         <nav className="side-nav" aria-label="Main navigation">
           <button
             className={view === "review" && tab !== "prep" ? "active" : ""}
+            aria-current={view === "review" && tab !== "prep" ? "page" : undefined}
             onClick={() => {
               setView("review");
               setTab("overview");
@@ -417,6 +420,7 @@ export default function Navigator() {
           </button>
           <button
             className={view === "library" ? "active" : ""}
+            aria-current={view === "library" ? "page" : undefined}
             onClick={() => {
               setView("library");
               setMobileOpen(false);
@@ -427,6 +431,7 @@ export default function Navigator() {
           </button>
           <button
             className={tab === "prep" && view === "review" ? "active" : ""}
+            aria-current={tab === "prep" && view === "review" ? "page" : undefined}
             onClick={() => {
               setView("review");
               setTab("prep");
@@ -443,6 +448,7 @@ export default function Navigator() {
             <button
               key={d.id}
               className={`recent-document ${d.id === doc.id && view === "review" ? "selected" : ""}`}
+              aria-current={d.id === doc.id && view === "review" ? "page" : undefined}
               onClick={() => selectDocument(d.id)}
             >
               <FileText size={17} />
@@ -508,12 +514,12 @@ export default function Navigator() {
               {view === "library" ? "All documents" : "Document review"}
             </span>
           </div>
-          <button className="top-help" onClick={() => setInfoOpen(true)}>
+          <button className="top-help" aria-label="About Navigator" onClick={() => setInfoOpen(true)}>
             <HelpCircle size={15} />
             <span>A little guidance</span>
           </button>
         </header>
-        <main>
+        <main id="main-content" tabIndex={-1}>
           <div className="page-heading">
             <div>
               <div className="eyebrow">LEGAL DOCUMENT NAVIGATOR</div>
@@ -699,6 +705,7 @@ export default function Navigator() {
                           setFilter(filter === "risk" ? "all" : "risk")
                         }
                         className={filter === "risk" ? "stat active" : "stat"}
+                        aria-pressed={filter === "risk"}
                       >
                         <span className="stat-label">
                           <CircleAlert size={15} />
@@ -718,6 +725,7 @@ export default function Navigator() {
                         className={
                           filter === "obligation" ? "stat active" : "stat"
                         }
+                        aria-pressed={filter === "obligation"}
                       >
                         <span className="stat-label">
                           <ListChecks size={15} />
@@ -733,6 +741,7 @@ export default function Navigator() {
                           setFilter(filter === "date" ? "all" : "date")
                         }
                         className={filter === "date" ? "stat active" : "stat"}
+                        aria-pressed={filter === "date"}
                       >
                         <span className="stat-label">
                           <Clock3 size={15} />
@@ -814,7 +823,7 @@ export default function Navigator() {
                             ? setPreviewOpen(true)
                             : showClause(doc.analysis.clauses[0].id)
                         }
-                        aria-label="Open original document"
+                        aria-label={doc.sample ? "Open original sample document" : "View extracted document text"}
                       >
                         {doc.sample ? (
                           <Image
@@ -911,6 +920,7 @@ export default function Navigator() {
                     <article
                       id={`clause-${c.id}`}
                       key={c.id}
+                      tabIndex={-1}
                       className={`clause-row ${activeClause === c.id ? "highlighted" : ""}`}
                     >
                       <div className="original-clause">
@@ -966,7 +976,7 @@ export default function Navigator() {
                         {doc.pageCount} pages
                       </span>
                     </div>
-                    <div className="chat-messages" aria-live="polite">
+                    <div className="chat-messages" role="log" aria-live="polite" aria-relevant="additions text" aria-busy={asking}>
                       {!doc.messages.length && (
                         <div className="chat-empty">
                           <span className="chat-emblem">
@@ -1025,7 +1035,7 @@ export default function Navigator() {
                         </div>
                       ))}
                       {asking && (
-                        <div className="thinking">
+                        <div className="thinking" role="status">
                           <LoaderCircle size={15} className="spin" />
                           Reading your document...
                         </div>

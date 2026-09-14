@@ -53,6 +53,20 @@ a {
   color: inherit;
   text-decoration: none;
 }
+.skip-link {
+  position: fixed;
+  left: 16px;
+  top: 12px;
+  z-index: 100;
+  padding: 10px 14px;
+  border-radius: 6px;
+  background: var(--ink);
+  color: #fff;
+  transform: translateY(-150%);
+}
+.skip-link:focus {
+  transform: translateY(0);
+}
 button,
 a,
 input,
@@ -181,7 +195,7 @@ svg {
   font-weight: 450;
   text-align: left;
   min-height: 40px;
-  color: #737373;
+  color: #666666;
   transition: background 0.15s;
 }
 .side-nav > button:hover {
@@ -218,7 +232,7 @@ svg {
   width: 100%;
   border-radius: 7px;
   align-items: flex-start;
-  color: #757575;
+  color: #666666;
 }
 .recent-document:hover,
 .recent-document.selected {
@@ -240,7 +254,7 @@ svg {
 }
 .recent-document small {
   display: block;
-  color: #737373;
+  color: #666666;
   font-size: 10px;
   margin-top: 2px;
   font-weight: 400;
@@ -422,7 +436,7 @@ main {
   background: #f7f7f7;
   padding: 13px 16px;
   border-radius: 6px;
-  color: #737373;
+  color: #666666;
 }
 .legal-banner > svg {
   color: #737373;
@@ -653,19 +667,20 @@ main {
 }
 .check-control {
   position: relative;
-  display: block;
+  display: grid;
+  place-items: center;
   cursor: pointer;
   flex-shrink: 0;
   margin-top: 3px;
-  width: 15px;
-  height: 15px;
+  width: 24px;
+  height: 24px;
 }
 .check-control input {
   position: absolute;
   opacity: 0;
-  width: 18px;
-  height: 18px;
-  inset: -2px;
+  width: 24px;
+  height: 24px;
+  inset: 0;
   margin: 0;
   cursor: pointer;
 }
@@ -718,13 +733,13 @@ main {
   border: 1px solid #e6e6e6;
   border-radius: 4px;
   padding: 4px 6px;
-  color: #737373;
+  color: #666666;
   font-weight: 450;
   white-space: nowrap;
 }
 .tag-strong {
   background: #f2f2f2;
-  color: #737373;
+  color: #666666;
   border-color: #e5e5e5;
 }
 .finding-copy > p {
@@ -2038,6 +2053,7 @@ main {
 @media (max-width: 760px) {
   .sidebar {
     transform: translateX(-100%);
+    visibility: hidden;
     width: 234px;
     transition: transform 0.22s;
     padding-left: 20px;
@@ -2045,6 +2061,7 @@ main {
   }
   .sidebar.sidebar-open {
     transform: translateX(0);
+    visibility: visible;
   }
   .sidebar-scrim {
     position: fixed;

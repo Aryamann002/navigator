@@ -8,3 +8,7 @@ artifacts/
 test-results/
 playwright-report/
 .claude-flow/
+/.swarm/*.db*
+/.swarm/backups/
+/agentdb.rvf*
+/ruvector.db
