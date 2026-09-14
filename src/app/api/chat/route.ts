@@ -6,7 +6,7 @@ import { ApiError, handleError, json, readJson, requireConfigured } from "@/lib/
 
 export const runtime = "nodejs";
 export const maxDuration = 180;
-const requestSchema = z.object({ document: z.union([z.object({ id: z.string().uuid() }), legalDocumentSchema]), message: z.string().trim().min(1).max(4000) });
+const requestSchema = z.object({ document: z.union([legalDocumentSchema, z.object({ id: z.string().uuid() })]), message: z.string().trim().min(1).max(4000) });
 
 export async function POST(request: Request) {
   try {

@@ -120,8 +120,8 @@ test("hosted browser-session mode analyzes and answers from an uploaded document
   const initialized = page.waitForResponse(response => response.url().endsWith("/api/status"));
   await page.goto("/");
   await initialized;
-  await expect(page.locator(".browser-session-note")).toContainText("Private browser-session mode is active");
   await page.getByRole("button", { name: "Upload document", exact: true }).click();
+  await expect(page.locator(".browser-session-note")).toContainText("Private browser-session mode is active");
   await page.locator('input[type="file"]').setInputFiles({
     name: "payment-terms.txt",
     mimeType: "text/plain",
