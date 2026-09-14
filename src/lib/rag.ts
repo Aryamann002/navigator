@@ -6,8 +6,13 @@ import type { LegalDocument } from "./contracts";
 
 const SESSION_SECONDS = 86_400;
 let auth: GoogleAuth | undefined;
+const localDocuments = new Map<string, Map<string, LegalDocument>>();
+const localSecret = randomBytes(32).toString("hex");
+
+export function freeMode() { return process.env.LOCAL_FREE_MODE === "true" && process.env.NODE_ENV !== "production"; }
 
 export function missingRagConfig(): string[] {
+  if (freeMode()) return [];
   const missing: string[] = [];
   if (!process.env.CLOUD_RUN_RAG_URL) missing.push("CLOUD_RUN_RAG_URL");
   if (!process.env.SESSION_SECRET || process.env.SESSION_SECRET.length < 32) missing.push("SESSION_SECRET");
@@ -17,7 +22,7 @@ export function missingRagConfig(): string[] {
 export function ragConfigured(): boolean { return missingRagConfig().length === 0; }
 
 export async function getSession(create = false): Promise<string | null> {
-  const secret = process.env.SESSION_SECRET;
+  const secret = process.env.SESSION_SECRET || (freeMode() ? localSecret : "");
   if (!secret || secret.length < 32) throw new Error("SESSION_SECRET must contain at least 32 characters.");
   const jar = await cookies();
   const name = process.env.NODE_ENV === "production" ? "__Host-ldn-session" : "ldn-session";
@@ -36,10 +41,24 @@ export async function getSession(create = false): Promise<string | null> {
   const session = randomBytes(32).toString("hex");
   const value = `${session}.${Date.now()}`;
   jar.set(name, `${value}.${sign(value)}`, { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "strict", path: "/", maxAge: SESSION_SECONDS });
+  if (freeMode()) localDocuments.set(session, localDocuments.get(session) || new Map());
   return session;
 }
 
 async function request<T>(session: string, id: string, method: string, body?: unknown, suffix = ""): Promise<T> {
+  if (freeMode()) {
+    const documents = localDocuments.get(session) || new Map<string, LegalDocument>();
+    localDocuments.set(session, documents);
+    if (method === "PUT") { const document = (body as { document: LegalDocument }).document; documents.set(id, document); return { documentId: id } as T; }
+    if (method === "GET") { const document = documents.get(id); if (!document) throw Object.assign(new Error("Document not found or session expired."), { status: 404 }); return document as T; }
+    if (method === "POST" && suffix === "/retrieve") {
+      const document = documents.get(id); if (!document) throw Object.assign(new Error("Document not found or session expired."), { status: 404 });
+      const query = String((body as { query?: string }).query || "").toLowerCase();
+      const passages = document.analysis.clauses.map(clause => ({ id: clause.id, text: clause.original, score: query.split(/\s+/).filter(word => word.length > 2 && clause.original.toLowerCase().includes(word)).length })).sort((a,b) => b.score-a.score).slice(0, 8);
+      return { document, passages } as T;
+    }
+    if (method === "DELETE") { documents.delete(id); return undefined as T; }
+  }
   if (!ragConfigured()) throw Object.assign(new Error("Encrypted document storage is not configured."), { status: 503 });
   if (!/^[a-f0-9]{64}$/.test(session) || !/^[a-f0-9-]{36}$/i.test(id)) throw Object.assign(new Error("Invalid document session."), { status: 400 });
   const endpoint = new URL(process.env.CLOUD_RUN_RAG_URL!);

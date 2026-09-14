@@ -12,4 +12,4 @@ export type Analysis = z.infer<typeof analysisSchema>;
 export type Finding = z.infer<typeof findingSchema>;
 export type Message = { role: "user" | "assistant"; content: string; citations?: string[] };
 export type LegalDocument = { id: string; filename: string; uploadedAt: string; pageCount: number; text: string; analysis: Analysis; messages: Message[]; checked: string[]; sample?: boolean };
-export type ServiceStatus = { ready: boolean; missing: string[]; storage: "encrypted-cloud" | "unavailable"; model: string };
+export type ServiceStatus = { ready: boolean; missing: string[]; storage: "encrypted-cloud" | "local-memory" | "unavailable"; model: string };

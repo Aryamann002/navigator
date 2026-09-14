@@ -55,8 +55,12 @@ test("document review, grounded sample Q&A, PDF, and upload boundaries", async (
   await expect(page.locator("dialog")).toBeVisible();
   await page.locator('input[type="file"]').setInputFiles({ name: "photo.jpg", mimeType: "image/jpeg", buffer: Buffer.from("invalid") });
   await expect(page.locator("dialog").getByRole("alert")).toContainText("Choose a PDF");
-  await page.locator('input[type="file"]').setInputFiles("public/sample-contract.pdf");
-  await expect(page.locator("dialog").getByRole("alert")).toContainText("awaiting its secure AI and storage connections");
+  if (await page.locator(".local-mode-note").count()) {
+    await expect(page.locator(".local-mode-note")).toContainText("Free local mode is active");
+  } else {
+    await page.locator('input[type="file"]').setInputFiles("public/sample-contract.pdf");
+    await expect(page.locator("dialog").getByRole("alert")).toContainText("awaiting its secure AI and storage connections");
+  }
   await page.screenshot({ path: `artifacts/${testInfo.project.name}-upload.png`, fullPage: true });
   await page.getByRole("button", { name: "Close dialog", exact: true }).click();
   await expect(page.locator("dialog")).not.toBeVisible();

@@ -6,7 +6,7 @@ import { createVertex } from "@ai-sdk/google-vertex";
 import { generateText, Output } from "ai";
 import { z } from "zod";
 import { analysisSchema, DISCLAIMER, type Analysis, type LegalDocument, type ServiceStatus } from "./contracts";
-import { missingRagConfig, ragConfigured } from "./rag";
+import { freeMode, missingRagConfig, ragConfigured } from "./rag";
 
 export const LEGAL_SYSTEM = `${DISCLAIMER}
 You provide accessible information about a user's document and help them prepare for a qualified lawyer.
@@ -52,12 +52,14 @@ function googleConfigured() {
 export async function getServiceStatus(): Promise<ServiceStatus> {
   const missing = missingRagConfig();
   if (!process.env.GROQ_API_KEY) missing.push("GROQ_API_KEY");
+  if (freeMode()) return { ready: missing.length === 0, missing: [...new Set(missing)], storage: "local-memory", model: process.env.GROQ_MODEL || "openai/gpt-oss-20b" };
   if (!process.env.GOOGLE_CLOUD_PROJECT && !process.env.GOOGLE_VERTEX_PROJECT) missing.push("GOOGLE_CLOUD_PROJECT");
   if (!googleConfigured()) missing.push("Google Cloud credentials");
   return { ready: missing.length === 0, missing: [...new Set(missing)], storage: ragConfigured() && googleConfigured() ? "encrypted-cloud" : "unavailable", model: process.env.VERTEX_MODEL || "gemini-2.5-pro" };
 }
 
 function vertexModel() {
+  if (freeMode()) return createGroq({ apiKey: process.env.GROQ_API_KEY })(process.env.GROQ_MODEL || "openai/gpt-oss-20b");
   const serviceAccount = credentials();
   return createVertex({
     project: process.env.GOOGLE_CLOUD_PROJECT || process.env.GOOGLE_VERTEX_PROJECT,
@@ -68,7 +70,7 @@ function vertexModel() {
 
 export async function routeIntent(message: string): Promise<Intent> {
   const { output } = await generateText({
-    model: createGroq({ apiKey: process.env.GROQ_API_KEY })(process.env.GROQ_MODEL || "llama-3.3-70b-versatile"),
+    model: createGroq({ apiKey: process.env.GROQ_API_KEY })(process.env.GROQ_MODEL || "openai/gpt-oss-20b"),
     system: `${LEGAL_SYSTEM}\nClassify the request only. summary: broad overview or initial document analysis; clause: specific wording or cross-reference; obligations: responsibilities or potential concerns; dates: deadlines; legal_advice: asks for a legal decision or recommendation; out_of_scope: unrelated to this document. Never answer the request.`,
     prompt: JSON.stringify({ request: message }),
     output: Output.object({ schema: intentSchema }),
@@ -81,6 +83,27 @@ export async function routeIntent(message: string): Promise<Intent> {
 }
 
 export function normalizeSource(text: string) { return text.replace(/\s+/g, " ").trim(); }
+
+export function buildFreeFallback(pages: SourcePage[], filename: string): Analysis {
+  const clauses = pages.flatMap((page) => {
+    const segments = normalizeSource(page.text).split(/(?<=[.!?])\s+/).filter(Boolean);
+    return (segments.length ? segments : [normalizeSource(page.text)]).map((original, index) => ({
+      id: `local-${page.page}-${index + 1}`,
+      heading: `Page ${page.page}${segments.length > 1 ? ` / ${index + 1}` : ""}`,
+      original,
+      plain: `In plain English: ${original}`,
+      page: page.page,
+    }));
+  });
+  return {
+    title: filename.replace(/\.[^.]+$/, "") || "Uploaded document",
+    documentType: "Uploaded document",
+    summary: "A basic source-preserving preview is available. Groq could not produce a structured analysis for this document, so review the original wording with a legal professional.",
+    clauses,
+    findings: [],
+    questions: ["Which terms should I review most closely with a legal professional?", "Are any obligations, deadlines, or risks missing from this basic preview?"],
+  };
+}
 
 export function validateAnalysis(value: unknown, pages: SourcePage[]): Analysis {
   const analysis = analysisSchema.parse(value);

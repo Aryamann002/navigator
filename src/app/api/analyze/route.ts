@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
-import { analyzeDocument } from "@/lib/ai";
+import { analyzeDocument, buildFreeFallback } from "@/lib/ai";
 import { type LegalDocument } from "@/lib/contracts";
-import { getSession, putDocument } from "@/lib/rag";
+import { freeMode, getSession, putDocument } from "@/lib/rag";
 import { ApiError, checkRequest, handleError, json, parseUpload, readBody, requireConfigured } from "@/lib/server";
 
 export const runtime = "nodejs";
@@ -23,7 +23,12 @@ export async function POST(request: Request) {
     const session = await getSession(true);
     if (!session) throw new ApiError(503, "A secure document session could not be created.");
     const filename = file.name.replace(/[^\p{L}\p{N} ._()-]/gu, "_").slice(0, 200);
-    const analysis = await analyzeDocument(pages, filename);
+    let analysis;
+    try { analysis = await analyzeDocument(pages, filename); }
+    catch (error) {
+      if (!freeMode()) throw error;
+      analysis = buildFreeFallback(pages, filename);
+    }
     const document: LegalDocument = { id: randomUUID(), filename, uploadedAt: new Date().toISOString(), pageCount, text, analysis, messages: [], checked: [] };
     await putDocument(session, document);
     return json({ document });

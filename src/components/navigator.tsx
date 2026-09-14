@@ -1314,7 +1314,7 @@ export default function Navigator() {
                   {error}
                 </p>
               )}
-              {status && !status.ready && (
+        {status && !status.ready && (
                 <div className="connection-note">
                   <CircleAlert size={17} />
                   <div>
@@ -1325,7 +1325,12 @@ export default function Navigator() {
                     </p>
                   </div>
                 </div>
-              )}
+        )}
+        {status?.ready && status.storage === "local-memory" && (
+          <div className="connection-note local-mode-note">
+            <CircleAlert size={17} /><div><strong>Free local mode is active.</strong><p>Uploads use Groq and reset when this dev server restarts. Do not upload sensitive legal documents in this mode.</p></div>
+          </div>
+        )}
               <p className="upload-privacy">
                 <LockKeyhole size={14} />
                 Uploads are processed by the configured AI services and stored

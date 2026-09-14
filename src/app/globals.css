@@ -1615,6 +1615,8 @@ main {
   margin-top: 16px;
   color: #737373;
 }
+.local-mode-note { background: #fafafa; border-color: #dedede; color: #737373; }
+.local-mode-note strong { color: #454545; }
 .connection-note > svg {
   margin-top: 2px;
 }
