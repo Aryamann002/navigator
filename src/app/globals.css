@@ -1628,7 +1628,7 @@ main {
   border-radius: 5px;
   padding: 13px;
   margin-top: 16px;
-  color: #737373;
+  color: #666;
 }
 .local-mode-note { background: #fafafa; border-color: #dedede; color: #737373; }
 .local-mode-note strong { color: #454545; }

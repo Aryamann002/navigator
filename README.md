@@ -18,7 +18,7 @@ The built-in sample contract demonstrates the entire workflow without pretending
 
 | Service | Use in the application |
 | --- | --- |
-| Groq (`openai/gpt-oss-20b` by default) | Classifies user questions before document retrieval and reasoning. It also provides analysis, Q&A, and prep generation in the explicitly local-only free mode. |
+| Groq (`openai/gpt-oss-20b` by default) | Classifies user questions before retrieval. It also provides analysis, grounded Q&A, and prep generation in local or browser-session demo mode. |
 | Vertex AI Gemini (`gemini-2.5-pro` by default) | Produces complete clause translations, document summaries, source-linked findings, grounded answers, and lawyer-preparation content in the production architecture. |
 | Vertex AI embeddings (`gemini-embedding-001`) | Embeds encrypted document chunks and questions in the private Cloud Run RAG service for semantic retrieval. |
 
@@ -34,6 +34,8 @@ npm run dev
 Open http://localhost:3000.
 
 Create `.env.local` from `.env.example`. For local experiments without Vertex AI, Cloud Run, or Firebase billing, set `LOCAL_FREE_MODE=true` and provide a Groq key. Local mode uses in-memory session storage, resets when the server restarts, and is automatically disabled in production.
+
+For a hosted demonstration without persistent document storage, set `BROWSER_SESSION_MODE=true` and provide a Groq key. Uploaded document state remains in the active browser tab, is validated again at each API boundary, and disappears on refresh. Use the private Cloud Run architecture below when persistence is required.
 
 ## Production services
 

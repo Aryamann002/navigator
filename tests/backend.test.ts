@@ -1,8 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { PDFDocument } from "pdf-lib";
-import { DISCLAIMER, type LegalDocument } from "../src/lib/contracts";
-import { LEGAL_SYSTEM, validateAnalysis, validateAnswer } from "../src/lib/ai";
+import { DISCLAIMER, legalDocumentSchema, type LegalDocument } from "../src/lib/contracts";
+import { getServiceStatus, LEGAL_SYSTEM, validateAnalysis, validateAnswer } from "../src/lib/ai";
+import { rankPassages } from "../src/lib/rag";
 import { ApiError, checkRequest, handleError, MAX_UPLOAD_BYTES, parseUpload, readBody, readJson } from "../src/lib/server";
 import { POST as analyze } from "../src/app/api/analyze/route";
 
@@ -42,6 +43,23 @@ test("answers require exact document evidence and legal decisions receive a fixe
   const refusal = validateAnswer({ kind: "legal_advice", content: "You should sign this.", evidence: [] }, document);
   assert.ok(refusal.content.includes(DISCLAIMER));
   assert.ok(!refusal.content.includes("You should sign"));
+});
+
+test("browser-session mode is ready with Groq and validates stateless document input", async () => {
+  const savedMode = process.env.BROWSER_SESSION_MODE;
+  const savedKey = process.env.GROQ_API_KEY;
+  process.env.BROWSER_SESSION_MODE = "true";
+  process.env.GROQ_API_KEY = "test-key";
+  try {
+    assert.deepEqual(await getServiceStatus(), { ready: true, missing: [], storage: "browser-session", model: process.env.GROQ_MODEL || "openai/gpt-oss-20b" });
+    assert.equal(rankPassages(document, "monthly rent")[0].id, "c1");
+    assert.equal(legalDocumentSchema.safeParse({ ...document, filename: "x".repeat(201) }).success, false);
+  } finally {
+    if (savedMode === undefined) delete process.env.BROWSER_SESSION_MODE;
+    else process.env.BROWSER_SESSION_MODE = savedMode;
+    if (savedKey === undefined) delete process.env.GROQ_API_KEY;
+    else process.env.GROQ_API_KEY = savedKey;
+  }
 });
 
 test("requests enforce origin, declared size, actual stream size and valid JSON", async () => {

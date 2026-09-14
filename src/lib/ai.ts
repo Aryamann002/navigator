@@ -6,7 +6,7 @@ import { createVertex } from "@ai-sdk/google-vertex";
 import { generateText, Output } from "ai";
 import { z } from "zod";
 import { analysisSchema, DISCLAIMER, type Analysis, type LegalDocument, type ServiceStatus } from "./contracts";
-import { freeMode, missingRagConfig, ragConfigured } from "./rag";
+import { browserSessionMode, groqMode, missingRagConfig, ragConfigured } from "./rag";
 
 export const LEGAL_SYSTEM = `${DISCLAIMER}
 You provide accessible information about a user's document and help them prepare for a qualified lawyer.
@@ -52,14 +52,14 @@ function googleConfigured() {
 export async function getServiceStatus(): Promise<ServiceStatus> {
   const missing = missingRagConfig();
   if (!process.env.GROQ_API_KEY) missing.push("GROQ_API_KEY");
-  if (freeMode()) return { ready: missing.length === 0, missing: [...new Set(missing)], storage: "local-memory", model: process.env.GROQ_MODEL || "openai/gpt-oss-20b" };
+  if (groqMode()) return { ready: missing.length === 0, missing: [...new Set(missing)], storage: browserSessionMode() ? "browser-session" : "local-memory", model: process.env.GROQ_MODEL || "openai/gpt-oss-20b" };
   if (!process.env.GOOGLE_CLOUD_PROJECT && !process.env.GOOGLE_VERTEX_PROJECT) missing.push("GOOGLE_CLOUD_PROJECT");
   if (!googleConfigured()) missing.push("Google Cloud credentials");
   return { ready: missing.length === 0, missing: [...new Set(missing)], storage: ragConfigured() && googleConfigured() ? "encrypted-cloud" : "unavailable", model: process.env.VERTEX_MODEL || "gemini-2.5-pro" };
 }
 
 function vertexModel() {
-  if (freeMode()) return createGroq({ apiKey: process.env.GROQ_API_KEY })(process.env.GROQ_MODEL || "openai/gpt-oss-20b");
+  if (groqMode()) return createGroq({ apiKey: process.env.GROQ_API_KEY })(process.env.GROQ_MODEL || "openai/gpt-oss-20b");
   const serviceAccount = credentials();
   return createVertex({
     project: process.env.GOOGLE_CLOUD_PROJECT || process.env.GOOGLE_VERTEX_PROJECT,

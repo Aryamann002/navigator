@@ -101,6 +101,8 @@ test("document review, grounded sample Q&A, PDF, and upload boundaries", async (
   await expect(page.locator("dialog").getByRole("alert")).toContainText("Choose a PDF");
   if (await page.locator(".local-mode-note").count()) {
     await expect(page.locator(".local-mode-note")).toContainText("Free local mode is active");
+  } else if (await page.locator(".browser-session-note").count()) {
+    await expect(page.locator(".browser-session-note")).toContainText("Private browser-session mode is active");
   } else {
     await page.locator('input[type="file"]').setInputFiles("public/sample-contract.pdf");
     await expect(page.locator("dialog").getByRole("alert")).toContainText("awaiting its secure AI and storage connections");
@@ -110,4 +112,25 @@ test("document review, grounded sample Q&A, PDF, and upload boundaries", async (
   await expect(page.locator("dialog")).not.toBeVisible();
   await expect(page.locator(".legal-banner")).toBeVisible();
   expect(errors).toEqual([]);
+});
+
+test("hosted browser-session mode analyzes and answers from an uploaded document", async ({ page }, testInfo) => {
+  test.skip(process.env.TEST_LIVE_UPLOAD !== "true" || testInfo.project.name !== "desktop");
+  test.setTimeout(300_000);
+  const initialized = page.waitForResponse(response => response.url().endsWith("/api/status"));
+  await page.goto("/");
+  await initialized;
+  await expect(page.locator(".browser-session-note")).toContainText("Private browser-session mode is active");
+  await page.getByRole("button", { name: "Upload document", exact: true }).click();
+  await page.locator('input[type="file"]').setInputFiles({
+    name: "payment-terms.txt",
+    mimeType: "text/plain",
+    buffer: Buffer.from("The client must pay INR 10,000 within 15 days after receiving an invoice. Either party may terminate with 30 days written notice."),
+  });
+  await expect(page.locator("dialog")).not.toBeVisible({ timeout: 240_000 });
+  await page.getByRole("button", { name: "Ask your document", exact: true }).first().click();
+  await page.getByLabel("Ask about your document", { exact: true }).fill("When must the client pay?");
+  await page.getByRole("button", { name: "Send question", exact: true }).click();
+  await expect(page.locator(".chat-message.assistant").last()).toContainText(/15 days|fifteen days/i, { timeout: 150_000 });
+  await expect(page.locator(".chat-message.assistant").last().locator(".source-link")).not.toHaveCount(0);
 });

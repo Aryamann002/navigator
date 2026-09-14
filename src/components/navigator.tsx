@@ -78,6 +78,7 @@ export default function Navigator() {
   const [search, setSearch] = useState("");
   const [previewOpen, setPreviewOpen] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const sessionOnly = status?.storage === "browser-session";
   const fileInput = useRef<HTMLInputElement>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const chatEnd = useRef<HTMLDivElement>(null);
@@ -136,15 +137,20 @@ export default function Navigator() {
     setDocuments((ds) => ds.map((d) => (d.id === id ? update(d) : d)));
   }
   function rememberDocumentIds(ids: string[]) {
-    try { sessionStorage.setItem("navigator-document-ids", JSON.stringify(ids.slice(-20))); }
+    try {
+      if (sessionOnly) sessionStorage.removeItem("navigator-document-ids");
+      else sessionStorage.setItem("navigator-document-ids", JSON.stringify(ids.slice(-20)));
+    }
     catch { /* The current in-memory session remains usable. */ }
   }
   async function removeDocument(document: LegalDocument) {
     if (document.sample || !window.confirm(`Delete ${document.filename} and its conversation from your private session?`)) return;
     setDeleting(document.id);
     try {
-      const response = await fetch(`/api/documents/${document.id}`, { method: "DELETE" });
-      if (!response.ok) throw new Error((await response.json()).error || "The document could not be deleted.");
+      if (!sessionOnly) {
+        const response = await fetch(`/api/documents/${document.id}`, { method: "DELETE" });
+        if (!response.ok) throw new Error((await response.json()).error || "The document could not be deleted.");
+      }
       setDocuments(current => current.filter(d => d.id !== document.id));
       rememberDocumentIds(documents.filter(d => !d.sample && d.id !== document.id).map(d => d.id));
       if (selectedId === document.id) setSelectedId(SAMPLE_DOCUMENT.id);
@@ -261,7 +267,7 @@ export default function Navigator() {
         const response = await fetch("/api/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ document: { id: documentId }, message }),
+          body: JSON.stringify({ document: sessionOnly ? doc : { id: documentId }, message }),
         });
         const data = await response.json();
         if (!response.ok)
@@ -292,7 +298,7 @@ export default function Navigator() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          document: {
+          document: sessionOnly && !doc.sample ? doc : {
             id: doc.id,
             messages: doc.sample ? doc.messages.slice(-40) : undefined,
             checked: doc.checked,
@@ -1341,6 +1347,11 @@ export default function Navigator() {
             <CircleAlert size={17} /><div><strong>Free local mode is active.</strong><p>Uploads use Groq and reset when this dev server restarts. Do not upload sensitive legal documents in this mode.</p></div>
           </div>
         )}
+        {status?.ready && status.storage === "browser-session" && (
+          <div className="connection-note browser-session-note">
+            <CircleAlert size={17} /><div><strong>Private browser-session mode is active.</strong><p>Uploads use Groq and remain only in this tab. Refreshing the page clears the document.</p></div>
+          </div>
+        )}
               <p className="upload-privacy">
                 <LockKeyhole size={14} />
                 Uploads are processed by the configured AI services and stored
@@ -1374,7 +1385,9 @@ export default function Navigator() {
                 <p>
                   {doc.sample
                     ? "This workspace currently contains an illustrative sample. Sample answers are prepared examples, not live AI output."
-                    : "Document access is tied to this browser's private session cookie. Your files are sent to the configured AI processors and encrypted in cloud storage."}
+                    : sessionOnly
+                      ? "Your document is sent to Groq for analysis and remains only in this browser tab. Refreshing or closing the tab clears it."
+                      : "Document access is tied to this browser's private session cookie. Your files are sent to the configured AI processors and encrypted in cloud storage."}
                 </p>
               </div>
               <button className="button button-dark" onClick={closeModal}>

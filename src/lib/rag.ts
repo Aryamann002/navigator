@@ -10,9 +10,11 @@ const localDocuments = new Map<string, Map<string, LegalDocument>>();
 const localSecret = randomBytes(32).toString("hex");
 
 export function freeMode() { return process.env.LOCAL_FREE_MODE === "true" && process.env.NODE_ENV !== "production"; }
+export function browserSessionMode() { return process.env.BROWSER_SESSION_MODE === "true"; }
+export function groqMode() { return freeMode() || browserSessionMode(); }
 
 export function missingRagConfig(): string[] {
-  if (freeMode()) return [];
+  if (groqMode()) return [];
   const missing: string[] = [];
   if (!process.env.CLOUD_RUN_RAG_URL) missing.push("CLOUD_RUN_RAG_URL");
   if (!process.env.SESSION_SECRET || process.env.SESSION_SECRET.length < 32) missing.push("SESSION_SECRET");
@@ -53,9 +55,7 @@ async function request<T>(session: string, id: string, method: string, body?: un
     if (method === "GET") { const document = documents.get(id); if (!document) throw Object.assign(new Error("Document not found or session expired."), { status: 404 }); return document as T; }
     if (method === "POST" && suffix === "/retrieve") {
       const document = documents.get(id); if (!document) throw Object.assign(new Error("Document not found or session expired."), { status: 404 });
-      const query = String((body as { query?: string }).query || "").toLowerCase();
-      const passages = document.analysis.clauses.map(clause => ({ id: clause.id, text: clause.original, score: query.split(/\s+/).filter(word => word.length > 2 && clause.original.toLowerCase().includes(word)).length })).sort((a,b) => b.score-a.score).slice(0, 8);
-      return { passages } as T;
+      return { passages: rankPassages(document, String((body as { query?: string }).query || "")) } as T;
     }
     if (method === "DELETE") { documents.delete(id); return undefined as T; }
   }
@@ -83,6 +83,14 @@ async function request<T>(session: string, id: string, method: string, body?: un
     if (status === 409) throw Object.assign(new Error("Conversation changed. Please retry your question."), { status: 409 });
     throw Object.assign(new Error("Encrypted document service is unavailable. Please try again."), { status: 503 });
   }
+}
+
+export function rankPassages(document: LegalDocument, query: string) {
+  const words = query.toLowerCase().split(/\s+/).filter(word => word.length > 2);
+  return document.analysis.clauses
+    .map(clause => ({ id: clause.id, text: clause.original, score: words.filter(word => clause.original.toLowerCase().includes(word)).length }))
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 8);
 }
 
 export async function putDocument(session: string, document: LegalDocument): Promise<{ documentId: string }> {

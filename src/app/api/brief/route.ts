@@ -1,8 +1,8 @@
 import { z } from "zod";
 import { BriefEncodingError, buildBrief } from "@/lib/brief";
 import { generatePrepSheet } from "@/lib/ai";
-import type { LegalDocument } from "@/lib/contracts";
-import { getDocument, getSession } from "@/lib/rag";
+import { legalDocumentSchema, type LegalDocument } from "@/lib/contracts";
+import { browserSessionMode, getDocument, getSession } from "@/lib/rag";
 import { SAMPLE_DOCUMENT } from "@/lib/sample";
 import { ApiError, handleError, readJson, requireConfigured } from "@/lib/server";
 
@@ -16,10 +16,13 @@ const requestSchema = z.object({
     checked: z.array(z.string().max(128)).max(100).optional(),
   }),
 });
+const sessionRequestSchema = z.object({ document: z.union([legalDocumentSchema, requestSchema.shape.document]) });
 
 export async function POST(request: Request) {
   try {
-    const parsed = requestSchema.safeParse(await readJson(request, 256_000));
+    const sessionOnly = browserSessionMode();
+    const body = await readJson(request, sessionOnly ? 900_000 : 256_000);
+    const parsed = (sessionOnly ? sessionRequestSchema : requestSchema).safeParse(body);
     if (!parsed.success) throw new ApiError(400, "A valid document reference is required.");
     const id = parsed.data.document.id;
     let document: LegalDocument;
@@ -29,6 +32,11 @@ export async function POST(request: Request) {
         messages: (parsed.data.document.messages ?? []).filter((message) => message.role === "user"),
         checked: (parsed.data.document.checked ?? []).filter((id) => SAMPLE_DOCUMENT.analysis.findings.some((finding) => finding.id === id)),
       };
+    } else if (sessionOnly) {
+      const supplied = legalDocumentSchema.safeParse(parsed.data.document);
+      if (!supplied.success) throw new ApiError(400, "The browser-session document is required.");
+      document = supplied.data;
+      document = { ...document, checked: document.checked.filter((findingId) => document.analysis.findings.some((finding) => finding.id === findingId)) };
     } else {
       await requireConfigured();
       const session = await getSession();

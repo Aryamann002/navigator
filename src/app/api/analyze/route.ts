@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { analyzeDocument, buildFreeFallback } from "@/lib/ai";
 import { type LegalDocument } from "@/lib/contracts";
-import { freeMode, getSession, putDocument } from "@/lib/rag";
+import { browserSessionMode, getSession, groqMode, putDocument } from "@/lib/rag";
 import { ApiError, checkRequest, handleError, json, parseUpload, readBody, requireConfigured } from "@/lib/server";
 
 export const runtime = "nodejs";
@@ -20,17 +20,19 @@ export async function POST(request: Request) {
     const file = form.get("file");
     if (!(file instanceof File) || form.getAll("file").length !== 1) throw new ApiError(400, "Upload one document at a time.");
     const { pages, text, pageCount } = await parseUpload(file);
-    const session = await getSession(true);
-    if (!session) throw new ApiError(503, "A secure document session could not be created.");
     const filename = file.name.replace(/[^\p{L}\p{N} ._()-]/gu, "_").slice(0, 200);
     let analysis;
     try { analysis = await analyzeDocument(pages, filename); }
     catch (error) {
-      if (!freeMode()) throw error;
+      if (!groqMode()) throw error;
       analysis = buildFreeFallback(pages, filename);
     }
     const document: LegalDocument = { id: randomUUID(), filename, uploadedAt: new Date().toISOString(), pageCount, text, analysis, messages: [], checked: [] };
-    await putDocument(session, document);
+    if (!browserSessionMode()) {
+      const session = await getSession(true);
+      if (!session) throw new ApiError(503, "A secure document session could not be created.");
+      await putDocument(session, document);
+    }
     return json({ document });
   } catch (error) { return handleError(error); }
 }
