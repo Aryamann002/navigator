@@ -108,3 +108,22 @@ test("unconfigured analysis returns an honest 503 without generating a document"
     else process.env.GROQ_API_KEY = savedKey;
   }
 });
+
+test("rankPassages handles phrase matching, empty queries, and missing clause fields", () => {
+  const customDoc: LegalDocument = {
+    ...document,
+    analysis: {
+      ...document.analysis,
+      clauses: [
+        { id: "c1", heading: "Rent Details", original: "Tenant pays USD 2000 per month.", plain: "Monthly rent.", page: 1 },
+        { id: "c2", heading: "Termination Clause", original: "Either party may terminate upon 30 days notice.", plain: "30 day cancellation.", page: 1 },
+      ],
+    },
+  };
+  const ranked = rankPassages(customDoc, "Tenant pays USD 2000 per month.");
+  assert.equal(ranked[0].id, "c1");
+  assert.ok(ranked[0].score > ranked[1].score);
+
+  const emptyRank = rankPassages(customDoc, "  ");
+  assert.equal(emptyRank.length, 2);
+});

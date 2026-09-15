@@ -86,9 +86,22 @@ async function request<T>(session: string, id: string, method: string, body?: un
 }
 
 export function rankPassages(document: LegalDocument, query: string) {
-  const words = query.toLowerCase().split(/\s+/).filter(word => word.length > 2);
+  const cleanQuery = query.toLowerCase().trim();
+  const words = cleanQuery.split(/\s+/).filter(word => word.length > 2);
   return document.analysis.clauses
-    .map(clause => ({ id: clause.id, text: clause.original, score: words.filter(word => clause.original.toLowerCase().includes(word)).length }))
+    .map(clause => {
+      const lowerOriginal = (clause.original || "").toLowerCase();
+      const lowerHeading = (clause.heading || "").toLowerCase();
+      const lowerPlain = (clause.plain || "").toLowerCase();
+      let score = 0;
+      if (cleanQuery && lowerOriginal.includes(cleanQuery)) score += 10;
+      for (const word of words) {
+        if (lowerHeading.includes(word)) score += 3;
+        if (lowerOriginal.includes(word)) score += 2;
+        if (lowerPlain.includes(word)) score += 1;
+      }
+      return { id: clause.id, text: clause.original || "", score };
+    })
     .sort((a, b) => b.score - a.score)
     .slice(0, 8);
 }

@@ -982,7 +982,7 @@ export default function Navigator() {
                         {doc.pageCount} pages
                       </span>
                     </div>
-                    <div className="chat-messages" role="log" aria-live="polite" aria-relevant="additions text" aria-busy={asking}>
+                    <div className="chat-messages" role="log" aria-live="polite" aria-relevant="additions text" aria-busy={asking} tabIndex={0} aria-label="Chat message history">
                       {!doc.messages.length && (
                         <div className="chat-empty">
                           <span className="chat-emblem">
@@ -1259,6 +1259,9 @@ export default function Navigator() {
       <dialog
         ref={dialogRef}
         aria-label={uploadOpen ? "Upload document" : previewOpen ? "Original sample document" : "About Navigator"}
+        aria-labelledby="modal-title"
+        aria-describedby="modal-description"
+        aria-modal="true"
         className={`modal ${previewOpen ? "preview-modal" : ""}`}
         onCancel={(e) => {
           e.preventDefault();
@@ -1282,8 +1285,8 @@ export default function Navigator() {
               <span className="modal-symbol">
                 <Upload size={24} />
               </span>
-              <h2>A little clarity starts here.</h2>
-              <p className="modal-description">Add your contract</p>
+              <h2 id="modal-title">A little clarity starts here.</h2>
+              <p id="modal-description" className="modal-description">Add your contract</p>
               <div
                 className={`dropzone ${dragging ? "dragging" : ""}`}
                 onDragOver={(e) => {
@@ -1365,8 +1368,8 @@ export default function Navigator() {
               <span className="modal-symbol">
                 <ShieldCheck size={26} />
               </span>
-              <h2>Clarity has a boundary.</h2>
-              <p className="info-lead">{DISCLAIMER}</p>
+              <h2 id="modal-title">Clarity has a boundary.</h2>
+              <p id="modal-description" className="info-lead">{DISCLAIMER}</p>
               <div className="info-content">
                 <h3>AI for Legal Assistance &amp; Access</h3>
                 <p>
@@ -1398,8 +1401,8 @@ export default function Navigator() {
           )}
           {previewOpen && (
             <>
-              <h2>Original sample document</h2>
-              <p className="modal-description">
+              <h2 id="modal-title">Original sample document</h2>
+              <p id="modal-description" className="modal-description">
                 Northstar Studio · Services agreement
               </p>
               <iframe

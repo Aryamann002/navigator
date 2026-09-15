@@ -12,6 +12,19 @@ const WIDTH = PAGE_WIDTH - MARGIN * 2;
 
 export class BriefEncodingError extends Error {}
 
+let fontCache: { regular: Buffer; bold: Buffer } | null = null;
+
+async function getFontBuffers() {
+  if (!fontCache) {
+    const [regular, bold] = await Promise.all([
+      readFile(path.join(process.cwd(), "public/fonts/NotoSans-Regular.ttf")),
+      readFile(path.join(process.cwd(), "public/fonts/NotoSans-Bold.ttf")),
+    ]);
+    fontCache = { regular, bold };
+  }
+  return fontCache;
+}
+
 function wrap(text: string, font: PDFFont, size: number): string[] {
   const lines: string[] = [];
   for (const paragraph of text.replace(/\r\n?/g, "\n").split("\n")) {
@@ -40,8 +53,9 @@ function wrap(text: string, font: PDFFont, size: number): string[] {
 export async function buildBrief(document: LegalDocument, prep?: PrepSheet): Promise<Uint8Array> {
   const pdf = await PDFDocument.create();
   pdf.registerFontkit(fontkit);
-  const regular = await pdf.embedFont(await readFile(path.join(process.cwd(), "public/fonts/NotoSans-Regular.ttf")), { subset: true });
-  const bold = await pdf.embedFont(await readFile(path.join(process.cwd(), "public/fonts/NotoSans-Bold.ttf")), { subset: true });
+  const fonts = await getFontBuffers();
+  const regular = await pdf.embedFont(fonts.regular, { subset: true });
+  const bold = await pdf.embedFont(fonts.bold, { subset: true });
   const boldSupported = new Set(bold.getCharacterSet());
   const supported = new Set(regular.getCharacterSet().filter((code) => boldSupported.has(code)));
   pdf.setTitle(`Lawyer prep-sheet: ${document.analysis.title}`);

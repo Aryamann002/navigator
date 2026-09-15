@@ -1,7 +1,7 @@
 :root {
   --white: #fff;
   --ink: #222222;
-  --muted: #7b7b7b;
+  --muted: #545454;
   --line: #e7e7e7;
   --surface: #f9f9f9;
   --subtle: #f2f2f2;
@@ -130,7 +130,7 @@ svg {
 }
 .brand-period {
   margin-left: -8px;
-  color: #737373;
+  color: #545454;
 }
 .button {
   min-height: 40px;
@@ -177,7 +177,7 @@ svg {
 .nav-label {
   font-size: 9px;
   font-weight: 600;
-  color: #737373;
+  color: #545454;
   margin: 34px 12px 12px;
 }
 .side-nav {
@@ -274,7 +274,7 @@ svg {
   padding: 18px 13px 21px;
 }
 .private-note > svg {
-  color: #737373;
+  color: #545454;
   margin-bottom: 10px;
 }
 .private-note strong {
@@ -285,7 +285,7 @@ svg {
 .private-note p {
   font-size: 10px;
   line-height: 1.8;
-  color: #737373;
+  color: #545454;
   margin-top: 7px;
 }
 .side-help {
@@ -298,7 +298,7 @@ svg {
 }
 .side-help > svg:last-child {
   margin-left: auto;
-  color: #737373;
+  color: #545454;
 }
 .profile {
   display: flex;
@@ -327,11 +327,11 @@ svg {
   display: block;
   font-size: 9px;
   font-weight: 400;
-  color: #737373;
+  color: #545454;
   margin-top: 3px;
 }
 .profile > svg {
-  color: #737373;
+  color: #545454;
 }
 .main-shell {
   margin-left: 234px;
@@ -348,12 +348,12 @@ svg {
   display: flex;
   align-items: center;
   gap: 13px;
-  color: #737373;
+  color: #545454;
   font-size: 11px;
 }
 .breadcrumb button {
   padding: 5px 0;
-  color: #737373;
+  color: #545454;
 }
 .breadcrumb span {
   color: #484848;
@@ -363,7 +363,7 @@ svg {
   align-items: center;
   gap: 7px;
   font-size: 11px;
-  color: #737373;
+  color: #545454;
 }
 .mobile-menu {
   display: none !important;
@@ -383,7 +383,7 @@ main {
 .eyebrow {
   font-size: 9px;
   font-weight: 550;
-  color: #737373;
+  color: #545454;
   margin-bottom: 11px;
 }
 .page-heading h1 {
@@ -392,14 +392,14 @@ main {
   line-height: 1.2;
 }
 .title-dot {
-  color: #737373;
+  color: #545454;
 }
 .document-meta {
   display: flex;
   align-items: center;
   gap: 8px;
   font-size: 10px;
-  color: #737373;
+  color: #545454;
   margin-top: 12px;
   flex-wrap: wrap;
 }
@@ -410,7 +410,7 @@ main {
   white-space: nowrap;
 }
 .separator {
-  color: #737373;
+  color: #545454;
   margin: 0 3px;
 }
 .sample-tag {
@@ -419,7 +419,7 @@ main {
   border-radius: 4px;
   font-size: 9px;
   background: #fbfbfb;
-  color: #737373;
+  color: #545454;
 }
 .heading-actions {
   display: flex;
@@ -439,7 +439,7 @@ main {
   color: #666666;
 }
 .legal-banner > svg {
-  color: #737373;
+  color: #545454;
 }
 .legal-banner p {
   font-size: 10px;
@@ -452,9 +452,10 @@ main {
   margin-right: 4px;
 }
 .icon-button {
-  width: 30px;
-  height: 30px;
-  min-width: 30px;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
   border-radius: 50%;
   display: inline-flex;
   align-items: center;
@@ -464,9 +465,10 @@ main {
   background: #ebebeb;
 }
 .legal-banner .icon-button {
-  width: 22px;
-  height: 22px;
-  min-width: 22px;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
 }
 .document-tabs {
   display: flex;
@@ -483,7 +485,7 @@ main {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #737373;
+  color: #545454;
   min-height: 54px;
   padding: 0 1px;
   white-space: nowrap;
@@ -518,7 +520,7 @@ main {
 .section-eyebrow {
   font-size: 9px;
   font-weight: 500;
-  color: #737373;
+  color: #545454;
   display: flex;
   align-items: center;
   gap: 7px;
@@ -532,7 +534,7 @@ main {
 }
 .summary-text {
   font-size: 13px;
-  color: #737373;
+  color: #545454;
   line-height: 1.9;
   margin: 12px 0 17px;
   max-width: 680px;
@@ -576,14 +578,14 @@ main {
 }
 .stat-label {
   font-size: 10px;
-  color: #737373;
+  color: #545454;
   display: flex;
   align-items: center;
   gap: 7px;
   white-space: nowrap;
 }
 .stat-label svg {
-  color: #737373;
+  color: #545454;
 }
 .stat-number {
   display: flex;
@@ -596,7 +598,7 @@ main {
   color: #3a3a3a;
 }
 .stat-number svg {
-  color: #737373;
+  color: #545454;
 }
 .findings-section {
   margin-top: 29px;
@@ -622,14 +624,14 @@ main {
   align-items: center;
   justify-content: center;
   background: #f2f2f2;
-  color: #737373;
+  color: #545454;
   border-radius: var(--rounded-full);
   font-size: 9px;
   font-weight: 500;
 }
 .review-count {
   font-size: 9px;
-  color: #737373;
+  color: #545454;
   white-space: nowrap;
 }
 .filter-row {
@@ -645,7 +647,7 @@ main {
   line-height: 1.2;
   padding: 7px 12px;
   border-radius: var(--rounded-full);
-  color: #737373;
+  color: #545454;
   border: 1px solid transparent;
 }
 .filter-button:hover {
@@ -667,19 +669,22 @@ main {
 }
 .check-control {
   position: relative;
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
   flex-shrink: 0;
-  margin-top: 3px;
-  width: 24px;
-  height: 24px;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  margin: -10px 0 -10px -10px;
 }
 .check-control input {
   position: absolute;
   opacity: 0;
-  width: 24px;
-  height: 24px;
+  width: 44px;
+  height: 44px;
   inset: 0;
   margin: 0;
   cursor: pointer;
@@ -688,9 +693,9 @@ main {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 15px;
-  height: 15px;
-  border: 1px solid #d2d2d2;
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid #8c8c8c;
   border-radius: 4px;
   background: white;
 }
@@ -744,7 +749,7 @@ main {
 }
 .finding-copy > p {
   font-size: 11px;
-  color: #737373;
+  color: #545454;
   line-height: 1.75;
   margin-top: 7px;
   max-width: 580px;
@@ -754,7 +759,7 @@ main {
   align-items: center;
   gap: 5px;
   font-size: 9px;
-  color: #737373;
+  color: #545454;
   padding: 0;
   line-height: 1.5;
 }
@@ -771,18 +776,18 @@ main {
   align-items: center;
   gap: 5px;
   font-size: 9px;
-  color: #737373;
+  color: #545454;
   margin-left: 15px;
 }
 .row-arrow {
-  color: #737373;
+  color: #545454;
   width: 23px;
   height: 23px;
   min-width: 23px;
   margin-top: -2px;
 }
 .reviewed .finding-title-line h3 {
-  color: #737373;
+  color: #545454;
 }
 .reviewed .finding-title-line h3::after {
   content: "Reviewed";
@@ -848,7 +853,7 @@ main {
   gap: 5px;
   align-items: center;
   font-size: 9px;
-  color: #737373;
+  color: #545454;
 }
 .source-footer .source-link {
   font-size: 9px;
@@ -869,7 +874,7 @@ main {
   align-items: center;
   justify-content: center;
   margin-bottom: 13px;
-  color: #737373;
+  color: #545454;
 }
 .quick-question h3 {
   font-size: 13px;
@@ -878,7 +883,7 @@ main {
 .quick-question p {
   font-size: 11px;
   line-height: 1.8;
-  color: #737373;
+  color: #545454;
   margin-top: 9px;
 }
 .quick-question .button {
@@ -892,7 +897,7 @@ main {
   display: flex;
   gap: 7px;
   margin-top: 21px;
-  color: #737373;
+  color: #545454;
 }
 .analysis-note svg {
   margin-top: 2px;
@@ -904,7 +909,7 @@ main {
 .workspace-footer {
   display: flex;
   justify-content: space-between;
-  color: #737373;
+  color: #545454;
   font-size: 9px;
   border-top: 1px solid var(--line);
   margin-top: 42px;
@@ -927,7 +932,7 @@ main {
   font-weight: 480;
 }
 .muted {
-  color: #737373;
+  color: #545454;
   font-size: 11px;
   line-height: 1.7;
 }
@@ -976,7 +981,7 @@ main {
 }
 .clause-number {
   font-size: 10px;
-  color: #737373;
+  color: #545454;
 }
 .clause-heading h3 {
   font-size: 12px;
@@ -984,14 +989,14 @@ main {
 }
 .clause-heading small {
   font-size: 9px;
-  color: #737373;
+  color: #545454;
   margin-left: auto;
   white-space: nowrap;
 }
 .original-clause > p {
   font-size: 12px;
   line-height: 1.9;
-  color: #737373;
+  color: #545454;
   margin-top: 12px;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
@@ -1013,7 +1018,7 @@ main {
   font-size: 9px;
   text-align: left;
   max-width: 100%;
-  color: #737373;
+  color: #545454;
 }
 .clause-finding:hover {
   background: #f0f0f0;
@@ -1047,7 +1052,7 @@ main {
 }
 .chat-heading p {
   font-size: 10px;
-  color: #737373;
+  color: #545454;
   margin-top: 8px;
 }
 .chat-messages {
@@ -1071,7 +1076,7 @@ main {
   border: 1px solid #e9e9e9;
   border-radius: 50%;
   margin: 0 auto 20px;
-  color: #737373;
+  color: #545454;
 }
 .chat-empty h3 {
   font-size: 19px;
@@ -1079,7 +1084,7 @@ main {
 }
 .chat-empty > p {
   font-size: 11px;
-  color: #737373;
+  color: #545454;
   margin: 10px 0 23px;
   line-height: 1.6;
 }
@@ -1097,7 +1102,7 @@ main {
   border-radius: var(--rounded-full);
   padding: 10px 13px;
   font-size: 10px;
-  color: #737373;
+  color: #545454;
 }
 .suggested-questions button:hover {
   background: #f4f4f4;
@@ -1115,7 +1120,7 @@ main {
 }
 .message-label > small {
   font-size: 8px;
-  color: #737373;
+  color: #545454;
   font-weight: 400;
   margin-left: 4px;
 }
@@ -1133,7 +1138,7 @@ main {
   line-height: 1.85;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
-  color: #737373;
+  color: #545454;
 }
 .chat-message.user {
   margin-left: 45px;
@@ -1180,7 +1185,7 @@ main {
   color: #434343;
 }
 .chat-composer textarea::placeholder {
-  color: #737373;
+  color: #545454;
 }
 .composer-bottom {
   display: flex;
@@ -1193,7 +1198,7 @@ main {
   align-items: center;
   gap: 5px;
   font-size: 9px;
-  color: #737373;
+  color: #545454;
 }
 .send-button {
   width: 31px;
@@ -1210,7 +1215,7 @@ main {
 }
 .chat-footnote {
   font-size: 9px;
-  color: #737373;
+  color: #545454;
   text-align: center;
   margin-top: 13px;
   line-height: 1.7;
@@ -1220,7 +1225,7 @@ main {
   align-items: center;
   gap: 8px;
   font-size: 11px;
-  color: #737373;
+  color: #545454;
   padding: 20px 0;
 }
 .chat-aside {
@@ -1245,18 +1250,18 @@ main {
 }
 .chat-aside > button > span {
   font-size: 9px;
-  color: #737373;
+  color: #545454;
 }
 .chat-aside > button > svg {
   margin-left: auto;
-  color: #737373;
+  color: #545454;
 }
 .chat-prep-note {
   padding-top: 29px;
   margin-top: 10px;
 }
 .chat-prep-note > svg {
-  color: #737373;
+  color: #545454;
   margin-bottom: 12px;
 }
 .chat-prep-note h3 {
@@ -1265,7 +1270,7 @@ main {
 }
 .chat-prep-note p {
   font-size: 10px;
-  color: #737373;
+  color: #545454;
   line-height: 1.8;
   margin-top: 9px;
 }
@@ -1290,7 +1295,7 @@ main {
 }
 .prep-intro > p {
   font-size: 12px;
-  color: #737373;
+  color: #545454;
   line-height: 1.9;
   margin-top: 13px;
 }
@@ -1300,7 +1305,7 @@ main {
 .prep-export-label {
   display: block;
   font-size: 9px;
-  color: #737373;
+  color: #545454;
   margin-top: 11px;
   padding-left: 14px;
 }
@@ -1327,7 +1332,7 @@ main {
 }
 .paper-heading > p {
   font-size: 10px;
-  color: #737373;
+  color: #545454;
   line-height: 1.7;
 }
 .prep-block {
@@ -1338,7 +1343,7 @@ main {
 }
 .prep-number {
   font-size: 10px;
-  color: #737373;
+  color: #545454;
   padding-top: 3px;
 }
 .prep-block > div {
@@ -1352,7 +1357,7 @@ main {
 }
 .prep-block p {
   font-size: 11px;
-  color: #737373;
+  color: #545454;
   line-height: 1.85;
   overflow-wrap: anywhere;
 }
@@ -1361,7 +1366,7 @@ main {
   flex-wrap: wrap;
   gap: 8px;
   font-size: 8px;
-  color: #737373;
+  color: #545454;
   margin-top: 15px;
 }
 .prep-facts span {
@@ -1386,7 +1391,7 @@ main {
 .prep-block ul {
   margin: 0;
   padding-left: 15px;
-  color: #737373;
+  color: #545454;
   font-size: 11px;
   line-height: 1.9;
 }
@@ -1401,7 +1406,7 @@ main {
   display: flex;
   gap: 8px;
   padding-top: 20px;
-  color: #737373;
+  color: #545454;
 }
 .paper-disclaimer p {
   font-size: 8px;
@@ -1421,7 +1426,7 @@ main {
   border-radius: var(--rounded-full);
   padding: 10px 14px;
   font-size: 11px;
-  color: #737373;
+  color: #545454;
 }
 .search-field input {
   border: 0;
@@ -1432,7 +1437,7 @@ main {
   font-size: 11px;
 }
 .search-field input::placeholder {
-  color: #737373;
+  color: #545454;
 }
 .document-table {
   margin-top: 21px;
@@ -1458,7 +1463,7 @@ main {
   place-items: center;
   border-radius: 5px;
   border: 1px solid #e8e8e8;
-  color: #737373;
+  color: #545454;
 }
 .document-table-row > span:nth-child(2) {
   flex: 1;
@@ -1472,20 +1477,20 @@ main {
 .document-table-row small {
   display: block;
   font-size: 10px;
-  color: #737373;
+  color: #545454;
   margin-top: 6px;
   overflow-wrap: anywhere;
 }
 .table-type,
 .table-pages {
   font-size: 10px;
-  color: #737373;
+  color: #545454;
 }
 .table-pages {
   margin: 0 25px;
 }
 .document-table-row > svg {
-  color: #737373;
+  color: #545454;
 }
 .library-upload {
   display: flex;
@@ -1497,12 +1502,12 @@ main {
   border-radius: 6px;
   width: 100%;
   margin-top: 22px;
-  color: #737373;
+  color: #545454;
   font-size: 12px;
 }
 .library-upload > span:last-child {
   font-size: 10px;
-  color: #737373;
+  color: #545454;
 }
 .library-upload:hover {
   background: #fbfbfb;
@@ -1511,7 +1516,7 @@ main {
   padding: 34px 20px;
   text-align: center;
   font-size: 12px;
-  color: #737373;
+  color: #545454;
   line-height: 1.8;
 }
 .modal {
@@ -1536,7 +1541,7 @@ main {
   position: absolute;
   right: 16px;
   top: 15px;
-  color: #737373;
+  color: #545454;
 }
 .modal-symbol {
   display: grid;
@@ -1546,7 +1551,7 @@ main {
   background: #f7f7f7;
   border: 1px solid #eaeaea;
   border-radius: 50%;
-  color: #737373;
+  color: #545454;
   margin-bottom: 21px;
 }
 .modal h2 {
@@ -1556,7 +1561,7 @@ main {
 }
 .modal-description {
   font-size: 12px;
-  color: #737373;
+  color: #545454;
   margin: 10px 0 23px;
   line-height: 1.8;
 }
@@ -1570,7 +1575,7 @@ main {
   justify-content: center;
   flex-direction: column;
   padding: 28px 15px;
-  color: #737373;
+  color: #545454;
 }
 .dropzone.dragging {
   background: #f2f2f2;
@@ -1604,7 +1609,7 @@ main {
   align-items: flex-start;
   gap: 7px;
   font-size: 10px;
-  color: #737373;
+  color: #545454;
   line-height: 1.8;
   margin-top: 19px;
 }
@@ -1613,7 +1618,7 @@ main {
 }
 .modal-legal {
   font-size: 9px;
-  color: #737373;
+  color: #545454;
   line-height: 1.8;
   border-top: 1px solid var(--line);
   margin-top: 17px;
@@ -1630,7 +1635,7 @@ main {
   margin-top: 16px;
   color: #666;
 }
-.local-mode-note { background: #fafafa; border-color: #dedede; color: #737373; }
+.local-mode-note { background: #fafafa; border-color: #dedede; color: #545454; }
 .local-mode-note strong { color: #454545; }
 .connection-note > svg {
   margin-top: 2px;
@@ -1666,7 +1671,7 @@ main {
   font-size: 14px;
   line-height: 1.8;
   margin-top: 17px;
-  color: #737373;
+  color: #545454;
 }
 .info-content {
   margin: 25px 0;
@@ -1679,7 +1684,7 @@ main {
 .info-content p {
   font-size: 11px;
   line-height: 1.9;
-  color: #737373;
+  color: #545454;
 }
 .preview-modal {
   width: min(790px, calc(100% - 30px));
@@ -2427,7 +2432,7 @@ main {
   .mobile-column-label {
     display: block;
     font-size: 8px;
-    color: #737373;
+    color: #545454;
     margin-bottom: 8px;
   }
   .original-clause > p {
