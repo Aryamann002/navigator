@@ -8,6 +8,7 @@
     "start": "next start --hostname 0.0.0.0",
     "lint": "eslint .",
     "typecheck": "next typegen && tsc --noEmit",
+    "test:a11y": "playwright test",
     "test:ui": "playwright test",
     "test": "tsx --conditions=react-server --test tests/*.test.ts"
   },

@@ -2650,3 +2650,11 @@ main {
     scroll-behavior: auto !important;
   }
 }
+@media (forced-colors: active) {
+  button, a, input, textarea, select {
+    border: 1px solid ButtonText !important;
+  }
+  button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible {
+    outline: 3px solid Highlight !important;
+  }
+}

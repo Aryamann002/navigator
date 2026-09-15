@@ -392,7 +392,7 @@ export default function Navigator() {
   return (
     <div className="app-shell">
       <a className="skip-link" href="#main-content">Skip to main content</a>
-      <aside className={`sidebar ${mobileOpen ? "sidebar-open" : ""}`}>
+      <aside id="sidebar-nav" className={`sidebar ${mobileOpen ? "sidebar-open" : ""}`} role="complementary" aria-label="Sidebar navigation">
         <Link className="brand" href="/" aria-label="Navigator home">
           <span className="brand-symbol">
             <BookOpen size={20} strokeWidth={1.7} />
@@ -401,6 +401,7 @@ export default function Navigator() {
         </Link>
         <button
           className="button button-dark new-document"
+          aria-haspopup="dialog"
           onClick={() => {
             setUploadOpen(true);
             setMobileOpen(false);
@@ -483,7 +484,7 @@ export default function Navigator() {
                 : "Your document belongs to your private session."}
             </p>
           </div>
-          <button className="side-help" onClick={() => setInfoOpen(true)}>
+          <button className="side-help" onClick={() => setInfoOpen(true)} aria-haspopup="dialog">
             <HelpCircle size={17} />
             About Navigator
             <ArrowUpRight size={14} />
@@ -509,6 +510,8 @@ export default function Navigator() {
           <button
             className="icon-button mobile-menu"
             aria-label="Open navigation"
+            aria-expanded={mobileOpen}
+            aria-controls="sidebar-nav"
             onClick={() => setMobileOpen(true)}
           >
             <Menu size={21} />
@@ -553,6 +556,7 @@ export default function Navigator() {
             <div className="heading-actions">
               <button
                 className="button button-outline upload-heading"
+                aria-haspopup="dialog"
                 onClick={() => setUploadOpen(true)}
               >
                 <Upload size={15} />
@@ -582,6 +586,7 @@ export default function Navigator() {
               onClick={() => setInfoOpen(true)}
               title="About this legal boundary"
               aria-label="About this legal boundary"
+              aria-haspopup="dialog"
             >
               <ArrowUpRight size={16} />
             </button>
@@ -1259,8 +1264,8 @@ export default function Navigator() {
       <dialog
         ref={dialogRef}
         aria-label={uploadOpen ? "Upload document" : previewOpen ? "Original sample document" : "About Navigator"}
-        aria-labelledby="modal-title"
-        aria-describedby="modal-description"
+        aria-labelledby={uploadOpen || infoOpen || previewOpen ? "modal-title" : undefined}
+        aria-describedby={uploadOpen || infoOpen || previewOpen ? "modal-description" : undefined}
         aria-modal="true"
         className={`modal ${previewOpen ? "preview-modal" : ""}`}
         onCancel={(e) => {
