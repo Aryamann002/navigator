@@ -25,6 +25,12 @@ export async function POST(request: Request) {
     try { analysis = await analyzeDocument(pages, filename); }
     catch (error) {
       if (!groqMode()) throw error;
+      const failure = error as { name?: unknown; code?: unknown; statusCode?: unknown };
+      console.warn("Structured analysis fallback", {
+        name: typeof failure.name === "string" ? failure.name : "UnknownError",
+        code: typeof failure.code === "string" ? failure.code : undefined,
+        status: typeof failure.statusCode === "number" ? failure.statusCode : undefined,
+      });
       analysis = buildFreeFallback(pages, filename);
     }
     const document: LegalDocument = { id: randomUUID(), filename, uploadedAt: new Date().toISOString(), pageCount, text, analysis, messages: [], checked: [] };
